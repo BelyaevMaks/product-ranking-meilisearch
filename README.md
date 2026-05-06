@@ -16,8 +16,8 @@
 |----------|------------|
 | **[docs/PIPELINE_AND_SCORING_REFERENCE.md](docs/PIPELINE_AND_SCORING_REFERENCE.md)** | **Полный** пайплайн + скоринг. |
 | [docs/PIPELINE.md](docs/PIPELINE.md) | Запуск, переменные окружения, артефакты. |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Поток данных, модули, API и фильтры витрин. |
-| [docs/SCORING.md](docs/SCORING.md) | Скоринг кратко (детали — в справочнике выше). |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Поток данных, матрица модулей, Meilisearch, **таблица API и фильтров**. |
+| [docs/SCORING.md](docs/SCORING.md) | Цепочка score, таблица стратегий, бусты, **окно vs half-life** (деталь — в справочнике). |
 | [docs/DATA.md](docs/DATA.md) | Где лежат сырые данные и почему они не в Git. |
 
 Правила для ассистентов при правках кода: [AGENTS.md](AGENTS.md).
@@ -68,11 +68,3 @@ python -u src/index_all_strategy_indexes.py
 | `docs/` | Актуальная документация. |
 | `artifacts/` | Выход пайплайна (в Git не коммитится, только `.gitkeep`). |
 | `docker-compose.yml` | Meilisearch + опционально API. |
-
-## Безопасность
-
-Не публикуйте ключи Meilisearch и сырые PII. Используйте `MEILI_MASTER_KEY` / `MEILISEARCH_MASTER_KEY` из окружения. См. [docs/DATA.md](docs/DATA.md).
-
-## Лицензия
-
-Уточните у владельца репозитория (внутренний проект).
