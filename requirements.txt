@@ -1,0 +1,12 @@
+# Core dependencies
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
+meilisearch==0.41.0
+pydantic==2.13.3
+
+# Data processing (for indexing pipeline)
+pandas==3.0.2
+numpy==2.4.4
+
+# HTTP client for health checks
+requests==2.32.5

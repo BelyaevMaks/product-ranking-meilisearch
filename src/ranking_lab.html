@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<!-- kixbox-ranking-ui: strategy-select; keep in sync with repo -->
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kixbox Ranking Lab</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --bg-soft: #fbf8f2;
+      --ink: #171717;
+      --muted: #6a6259;
+      --card: #fffdf8;
+      --line: #ddd2c2;
+      --accent: #c24d2c;
+      --accent-soft: #f2d6c7;
+      --ok: #2f7d4a;
+      --warn: #946200;
+      --shadow: 0 16px 50px rgba(53, 36, 16, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(194, 77, 44, 0.18), transparent 34%),
+        radial-gradient(circle at right 15%, rgba(0, 0, 0, 0.05), transparent 22%),
+        linear-gradient(180deg, #f8f3ea 0%, var(--bg) 52%, #efe6d9 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1240px, calc(100% - 32px));
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(249, 241, 229, 0.96));
+      border: 1px solid rgba(151, 122, 84, 0.18);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -35% auto;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(194, 77, 44, 0.18), transparent 70%);
+      filter: blur(8px);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 24px;
+      padding: 30px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(194, 77, 44, 0.08);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .hero-aside {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .mini-stat {
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(151, 122, 84, 0.16);
+      border-radius: 20px;
+      padding: 16px 18px;
+      backdrop-filter: blur(10px);
+    }
+
+    .mini-stat strong {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .mini-stat span {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .mini-stat span.index-uid-line {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      word-break: break-all;
+    }
+
+    .mini-stat select {
+      width: 100%;
+      margin-top: 4px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: white;
+      font: inherit;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      margin-top: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 252, 246, 0.9);
+      border: 1px solid rgba(151, 122, 84, 0.18);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .button-row,
+    .quick-pages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button,
+    .fake-button {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 10px 24px rgba(23, 23, 23, 0.18);
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .quick-pages button.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .check input {
+      width: auto;
+      margin: 0;
+    }
+
+    .results-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+    }
+
+    .badge.ok {
+      color: var(--ok);
+      border-color: rgba(47, 125, 74, 0.25);
+    }
+
+    .badge.warn {
+      color: var(--warn);
+      border-color: rgba(148, 98, 0, 0.25);
+    }
+
+    .query-box {
+      background: #161616;
+      color: #f8f5ef;
+      border-radius: 20px;
+      padding: 16px 18px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      overflow-x: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(151, 122, 84, 0.18);
+      border-radius: 22px;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      min-height: 240px;
+    }
+
+    .card h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .brand {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #f4ede1;
+      color: #5c4b37;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .price {
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .discount {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric {
+      background: #fbf7ef;
+      border: 1px solid #eadfcf;
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .empty {
+      padding: 30px;
+      border-radius: 22px;
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255,255,255,0.65);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notice {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 98, 0, 0.22);
+      background: rgba(255, 244, 219, 0.72);
+      color: #7a5400;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 20px, 1240px);
+      }
+
+      .panel,
+      .hero-inner {
+        padding: 18px;
+      }
+
+      .field-grid,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-ranking-ui="ranking_lab.html-v2">
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Локальная витрина проекта</div>
+          <h1>Kixbox Ranking Lab</h1>
+          <p class="lead">
+            Небольшой локальный интерфейс для работы с текущим индексом Meilisearch:
+            можно открывать готовые страницы магазина, менять сортировку, запускать
+            поиск с фильтрами и смотреть, как система ранжирует товары прямо сейчас.
+          </p>
+        </div>
+        <div class="hero-aside">
+          <div class="mini-stat">
+            <strong>Стратегия скоринга → индекс Meilisearch</strong>
+            <select id="strategy" title="Отдельный индекс на каждую стратегию. Заливка: python src/index_all_strategy_indexes.py">
+              <option value="baseline">baseline — A. Консервативный спрос</option>
+              <option value="funnel">funnel — B. Воронка интереса</option>
+              <option value="robust">robust — C. Устойчивый к шуму</option>
+              <option value="commercial">commercial — D. Коммерческий</option>
+            </select>
+            <span class="index-uid-line" id="indexName">kixbox_products_baseline</span>
+          </div>
+          <div class="mini-stat">
+            <strong>Документов</strong>
+            <span id="totalProducts">...</span>
+          </div>
+          <div class="mini-stat">
+            <strong>В наличии</strong>
+            <span id="stockProducts">...</span>
+          </div>
+          <div class="mini-stat">
+            <strong>Окно score</strong>
+            <span id="scoreWindow">...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <h2>Быстрые страницы</h2>
+        <p class="hint">Открывают готовые витрины магазина на основе обычных полей каталога: новинка, распродажа, пол и основная категория.</p>
+        <div class="quick-pages" id="quickPages"></div>
+
+        <div style="height: 18px"></div>
+
+        <h3>Поиск и фильтры</h3>
+        <form id="searchForm">
+          <label>
+            Текстовый запрос
+            <input type="text" id="q" placeholder="Например, hoodie, shirt, carhartt" />
+          </label>
+
+          <div class="field-grid">
+            <label>
+              Страница
+              <select id="page_tag">
+                <option value="">Любая</option>
+              </select>
+            </label>
+            <label>
+              Сортировка
+              <select id="sort_by"></select>
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Категория
+              <select id="category">
+                <option value="">Любая</option>
+              </select>
+            </label>
+            <label>
+              Бренд
+              <select id="brand">
+                <option value="">Любой</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Пол
+              <select id="gender">
+                <option value="">Любой</option>
+                <option value="male">Мужской</option>
+                <option value="female">Женский</option>
+                <option value="unknown">Не определён</option>
+              </select>
+            </label>
+            <div></div>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Цена от
+              <input type="number" id="min_price" min="0" step="0.01" placeholder="0" />
+            </label>
+            <label>
+              Цена до
+              <input type="number" id="max_price" min="0" step="0.01" placeholder="99999" />
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Сколько товаров
+              <input type="number" id="limit" min="1" max="100" value="24" />
+            </label>
+            <div></div>
+          </div>
+
+          <div class="checkbox-row">
+            <label class="check"><input type="checkbox" id="is_new" /> Только новинки</label>
+            <label class="check"><input type="checkbox" id="is_sale" /> Только распродажа</label>
+          </div>
+
+          <div class="button-row">
+            <button type="submit" class="primary">Искать</button>
+            <button type="button" id="resetButton" class="ghost">Сбросить</button>
+          </div>
+        </form>
+
+        <p class="footer-note">
+          Все запросы идут в текущий локальный API и дальше в индекс Meilisearch.
+        </p>
+        <div class="notice" id="pricingNotice">
+          Цены в этом интерфейсе идут из выгрузки проекта и могут не совпадать с живым магазином.
+        </div>
+      </aside>
+
+      <main class="panel">
+        <div class="results-top">
+          <div>
+            <h2 style="margin-bottom: 8px;">Результаты</h2>
+            <div class="status-row">
+              <span class="badge" id="resultCount">Ожидание запроса</span>
+              <span class="badge warn" id="healthBadge">Проверяем соединение...</span>
+            </div>
+          </div>
+          <button type="button" class="secondary" id="refreshHealth">Проверить индекс</button>
+        </div>
+
+        <div class="query-box" id="queryBox">Здесь появится описание текущего запроса.</div>
+        <div class="grid" id="resultsGrid"></div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      activePage: "",
+      pages: [],
+      sortOptions: [],
+      scoreWindow: null,
+      strategy: "baseline",
+      defaultStrategy: "baseline",
+    };
+
+    function formatNumber(value, digits = 0) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) {
+        return "—";
+      }
+      return Number(value).toLocaleString("ru-RU", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      });
+    }
+
+    function formatPrice(value) {
+      return `${formatNumber(value, 2)} ₽`;
+    }
+
+    function buildCard(product) {
+      const articleHtml = product.article
+        ? `<div class="brand" style="margin-top:6px;">Артикул: ${product.article}</div>`
+        : '';
+      const siteLinkHtml = product.product_url
+        ? `<div style="margin-top:10px;"><a href="${product.product_url}" target="_blank" rel="noopener noreferrer">Открыть на основном сайте</a></div>`
+        : '';
+      const salePill = product.is_sale ? '<span class="pill">Распродажа</span>' : '';
+      const newPill = product.is_new ? '<span class="pill">Новинка</span>' : '';
+      const stockPill = product.in_stock ? '<span class="pill">В наличии</span>' : '<span class="pill">Нет в наличии</span>';
+
+      const priceHtml = Number(product.price) > 0
+        ? `<div class="price">${formatPrice(product.price)}</div>`
+        : `<div class="price" style="font-size:22px;">Цена требует проверки</div>`;
+
+      return `
+        <article class="card">
+          <div>
+            <h4>${product.title}</h4>
+            ${articleHtml}
+            ${siteLinkHtml}
+            <div class="brand">${product.brand || product.vendor || 'Без бренда'}</div>
+          </div>
+          <div class="meta">
+            <span class="pill">${product.category_name || 'Без категории'}</span>
+            ${salePill}
+            ${newPill}
+            ${stockPill}
+          </div>
+          <div class="price-row">
+            ${priceHtml}
+            <div class="discount">${product.discount > 0 ? `Скидка ${formatNumber(product.discount * 100, 0)}%` : ''}</div>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <strong>Итоговый балл</strong>
+              <span>${formatNumber(product.final_score, 4)}</span>
+            </div>
+            <div class="metric">
+              <strong>Популярность</strong>
+              <span>${formatNumber(product.popularity, 4)}</span>
+            </div>
+            <div class="metric">
+              <strong>Новизна</strong>
+              <span>${formatNumber(product.novelty, 4)}</span>
+            </div>
+            <div class="metric">
+              <strong>Просмотры</strong>
+              <span>${formatNumber(product.views || 0, 0)}</span>
+            </div>
+            <div class="metric">
+              <strong>Покупки</strong>
+              <span>${formatNumber(product.purchases || 0, 0)}</span>
+            </div>
+            <div class="metric">
+              <strong>Возраст, дней</strong>
+              <span>${formatNumber(product.age_days || 0, 0)}</span>
+            </div>
+            <div class="metric">
+              <strong>Boost</strong>
+              <span>${formatNumber(product.boost || 1, 4)}</span>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderResults(payload, modeLabel) {
+      const grid = document.getElementById("resultsGrid");
+      const resultCount = document.getElementById("resultCount");
+      const queryBox = document.getElementById("queryBox");
+
+      resultCount.textContent = `Показано ${payload.count} из ${payload.total ?? payload.count} · ${payload.processing_time_ms} мс`;
+      queryBox.textContent = JSON.stringify({
+        score_window: state.scoreWindow?.label || "not specified",
+        as_of_date: state.scoreWindow?.as_of_date || null,
+        strategy: payload.strategy || null,
+        index_uid: payload.index_uid || null,
+        режим: modeLabel,
+        запрос: payload.query,
+        найдено: payload.count,
+        всего: payload.total,
+      }, null, 2);
+
+      if (!payload.hits || payload.hits.length === 0) {
+        grid.innerHTML = '<div class="empty">По текущим условиям товары не найдены.</div>';
+        return;
+      }
+
+      grid.innerHTML = payload.hits.map(buildCard).join("");
+    }
+
+    function markActivePage(pageKey) {
+      state.activePage = pageKey || "";
+      document.querySelectorAll(".quick-pages button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.page === state.activePage);
+      });
+      const pageSelect = document.getElementById("page_tag");
+      if (pageSelect && pageKey !== undefined) {
+        pageSelect.value = pageKey;
+      }
+    }
+
+    async function fetchHealth() {
+      const badge = document.getElementById("healthBadge");
+      badge.textContent = "Проверяем соединение...";
+      badge.className = "badge warn";
+      try {
+        const response = await fetch("/health");
+        const data = await response.json();
+        badge.textContent = `Meilisearch доступен · ${data.elapsed_ms} мс`;
+        badge.className = "badge ok";
+      } catch (error) {
+        badge.textContent = "Meilisearch недоступен";
+        badge.className = "badge warn";
+      }
+    }
+
+    async function loadMetadata() {
+      const response = await fetch("/app/meta");
+      const meta = await response.json();
+      state.pages = meta.pages || [];
+      state.sortOptions = meta.sort_options || [];
+      state.scoreWindow = meta.score_window || null;
+      state.strategy = meta.default_strategy || "baseline";
+      state.defaultStrategy = meta.default_strategy || "baseline";
+
+      document.getElementById("indexName").textContent = meta.index_name || meta.index_uid_default || "kixbox_products_baseline";
+      document.getElementById("totalProducts").textContent = formatNumber(meta.totals?.products || 0);
+      document.getElementById("stockProducts").textContent = formatNumber(meta.totals?.in_stock || 0);
+      const scoreWindowEl = document.getElementById("scoreWindow");
+      if (scoreWindowEl) {
+        scoreWindowEl.textContent = meta.score_window?.label || "Вся история";
+      }
+
+      const pageSelect = document.getElementById("page_tag");
+      const quickPages = document.getElementById("quickPages");
+      const sortSelect = document.getElementById("sort_by");
+      const strategySelect = document.getElementById("strategy");
+      const categorySelect = document.getElementById("category");
+      const brandSelect = document.getElementById("brand");
+      const pricingNotice = document.getElementById("pricingNotice");
+
+      meta.pages.forEach((page) => {
+        const option = document.createElement("option");
+        option.value = page.key;
+        option.textContent = page.label;
+        pageSelect.appendChild(option);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "ghost";
+        button.dataset.page = page.key;
+        button.textContent = page.label;
+        button.addEventListener("click", () => loadPage(page.key));
+        quickPages.appendChild(button);
+      });
+
+      meta.sort_options.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.key;
+        option.textContent = item.label;
+        sortSelect.appendChild(option);
+      });
+
+      strategySelect.innerHTML = "";
+      if (meta.strategies && meta.strategies.length > 0) {
+        meta.strategies.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.code;
+          option.textContent = `${item.label} → ${item.index_uid}`;
+          strategySelect.appendChild(option);
+        });
+      } else {
+        const base = meta.index_base || "kixbox_products";
+        [
+          ["baseline", "A. Консервативный спрос"],
+          ["funnel", "B. Воронка интереса"],
+          ["robust", "C. Устойчивый к шуму"],
+          ["commercial", "D. Коммерческий"],
+        ].forEach(([code, label]) => {
+          const option = document.createElement("option");
+          option.value = code;
+          option.textContent = `${label} → ${base}_${code}`;
+          strategySelect.appendChild(option);
+        });
+      }
+      strategySelect.value = state.strategy;
+      strategySelect.onchange = () => {
+        state.strategy = strategySelect.value;
+        const uid =
+          (meta.strategies || []).find((s) => s.code === state.strategy)?.index_uid ||
+          `${meta.index_base || "kixbox_products"}_${state.strategy}`;
+        document.getElementById("indexName").textContent = uid;
+        if (state.activePage) {
+          loadPage(state.activePage);
+        }
+      };
+
+      (meta.categories || []).forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+
+      (meta.brands || []).forEach((brand) => {
+        const option = document.createElement("option");
+        option.value = brand;
+        option.textContent = brand;
+        brandSelect.appendChild(option);
+      });
+
+      if (pricingNotice && meta.pricing_notice) {
+        pricingNotice.textContent = meta.pricing_notice;
+      }
+    }
+
+    async function loadPage(pageKey) {
+      const sortBy = document.getElementById("sort_by").value || "final_score";
+      const limit = document.getElementById("limit").value || "24";
+      markActivePage(pageKey);
+      const strat = document.getElementById("strategy").value || state.strategy || "baseline";
+      const response = await fetch(
+        `/products/page/${pageKey}?sort_by=${encodeURIComponent(sortBy)}&limit=${encodeURIComponent(limit)}&strategy=${encodeURIComponent(strat)}`
+      );
+      const payload = await response.json();
+      const pageLabel = (state.pages.find((page) => page.key === pageKey) || {}).label || pageKey;
+      renderResults(payload, `Готовая страница: ${pageLabel}`);
+    }
+
+    async function runSearch(event) {
+      if (event) {
+        event.preventDefault();
+      }
+
+      const body = {
+        q: document.getElementById("q").value.trim(),
+        page_tag: document.getElementById("page_tag").value || null,
+        category: document.getElementById("category").value || null,
+        brand: document.getElementById("brand").value || null,
+        gender: document.getElementById("gender").value || null,
+        min_price: document.getElementById("min_price").value ? Number(document.getElementById("min_price").value) : null,
+        max_price: document.getElementById("max_price").value ? Number(document.getElementById("max_price").value) : null,
+        is_new: document.getElementById("is_new").checked ? true : null,
+        is_sale: document.getElementById("is_sale").checked ? true : null,
+        limit: Number(document.getElementById("limit").value || 24),
+        sort_by: document.getElementById("sort_by").value || "final_score",
+        strategy: document.getElementById("strategy").value || state.strategy || null,
+      };
+
+      markActivePage(body.page_tag || "");
+
+      const response = await fetch("/products/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const payload = await response.json();
+      renderResults(payload, "Гибкий поиск");
+    }
+
+    function resetForm() {
+      document.getElementById("searchForm").reset();
+      document.getElementById("sort_by").value = "final_score";
+      document.getElementById("limit").value = "24";
+      if (state.defaultStrategy) {
+        document.getElementById("strategy").value = state.defaultStrategy;
+        state.strategy = state.defaultStrategy;
+      }
+      markActivePage("");
+    }
+
+    async function bootstrap() {
+      await loadMetadata();
+      await fetchHealth();
+      document.getElementById("searchForm").addEventListener("submit", runSearch);
+      document.getElementById("resetButton").addEventListener("click", () => {
+        resetForm();
+        loadPage("new_arrivals");
+      });
+      document.getElementById("refreshHealth").addEventListener("click", fetchHealth);
+      await loadPage("new_arrivals");
+    }
+
+    bootstrap().catch((error) => {
+      document.getElementById("resultsGrid").innerHTML = `<div class="empty">Не удалось загрузить интерфейс: ${error}</div>`;
+      console.error(error);
+    });
+  </script>
+</body>
+</html>

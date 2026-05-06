@@ -1,0 +1,36 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.7
+    container_name: kixbox-meilisearch
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-Yu4HfgPAV9gWM5nrutsfJi0b0RsXSFK8tiPw8Zx__Co}
+      - MEILI_NO_ANALYTICS=true
+    volumes:
+      - meilisearch_data:/meili_data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: kixbox-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MEILISEARCH_URL=http://meilisearch:7700
+      - MEILISEARCH_MASTER_KEY=${MEILI_MASTER_KEY:-Yu4HfgPAV9gWM5nrutsfJi0b0RsXSFK8tiPw8Zx__Co}
+      - MEILISEARCH_INDEX_NAME=${MEILISEARCH_INDEX_NAME:-kixbox_products}
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  meilisearch_data:
