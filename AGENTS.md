@@ -16,7 +16,7 @@
 5. **Validation**: Выдача для страниц "Новинки", "Распродажа", "Мужское", "Куртки".
 
 ## Формулы ранжирования
-Актуальные стратегии, бусты и env — в [docs/SCORING.md](docs/SCORING.md). Кратко (baseline):
+Единый подробный справочник: [docs/PIPELINE_AND_SCORING_REFERENCE.md](docs/PIPELINE_AND_SCORING_REFERENCE.md). Кратко (baseline):
 - **Popularity**: `(views * 0.3 + purchases * 0.7) * exp(-λ * age_days)` (λ от half-life)
 - **Novelty**: `-log2((purchases + 1) / (total_purchases + 1))`
 - **Final Score**: `log1p(popularity) * (novelty * NOVELTY_WEIGHT / 14) * boost`

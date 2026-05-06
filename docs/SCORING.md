@@ -1,5 +1,7 @@
 # Скоринг и стратегии
 
+**Все формулы, стратегии, бусты и порядок расчёта `age_days` подробно:** [PIPELINE_AND_SCORING_REFERENCE.md](PIPELINE_AND_SCORING_REFERENCE.md).
+
 ## Итоговая формула
 
 ```text

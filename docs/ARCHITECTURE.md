@@ -1,5 +1,7 @@
 # Архитектура
 
+Детальный разбор этапов и полей данных: [PIPELINE_AND_SCORING_REFERENCE.md](PIPELINE_AND_SCORING_REFERENCE.md).
+
 ## Поток данных
 
 ```text

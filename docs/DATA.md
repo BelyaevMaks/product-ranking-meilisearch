@@ -1,5 +1,7 @@
 # Данные и конфиденциальность
 
+Пайплайн и скоринг целиком: [PIPELINE_AND_SCORING_REFERENCE.md](PIPELINE_AND_SCORING_REFERENCE.md).
+
 ## Где лежат сырые файлы
 
 Каталог по умолчанию: **`Personalisation LAB 26/`** в корне репозитория (см. `PipelineConfig.from_project_root`).

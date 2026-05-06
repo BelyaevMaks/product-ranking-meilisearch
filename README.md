@@ -2,13 +2,22 @@
 
 Прототип ETL и скоринга для витрин: выгрузка каталога (InSales) + события Mindbox → product-level каталог → метрики → индекс **Meilisearch** → **FastAPI**.
 
-## Документация (начните здесь)
+## Канонический справочник для команды
+
+**Один файл — максимально подробно: весь пайплайн обработки данных и все формулы скоринга** (точка синхронизации при объединении решений):
+
+→ **[docs/PIPELINE_AND_SCORING_REFERENCE.md](docs/PIPELINE_AND_SCORING_REFERENCE.md)**
+
+Если текст и код расходятся, верьте коду в `pipeline/` и `src/` и обновите этот документ в том же изменении.
+
+## Документация (краткие оглавления)
 
 | Документ | Содержание |
 |----------|------------|
+| **[docs/PIPELINE_AND_SCORING_REFERENCE.md](docs/PIPELINE_AND_SCORING_REFERENCE.md)** | **Полный** пайплайн + скоринг. |
 | [docs/PIPELINE.md](docs/PIPELINE.md) | Запуск, переменные окружения, артефакты. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Поток данных, модули, API и фильтры витрин. |
-| [docs/SCORING.md](docs/SCORING.md) | Стратегии, формулы, бусты, окно vs half-life. |
+| [docs/SCORING.md](docs/SCORING.md) | Скоринг кратко (детали — в справочнике выше). |
 | [docs/DATA.md](docs/DATA.md) | Где лежат сырые данные и почему они не в Git. |
 
 Правила для ассистентов при правках кода: [AGENTS.md](AGENTS.md).
